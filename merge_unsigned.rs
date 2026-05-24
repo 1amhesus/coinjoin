@@ -9,25 +9,24 @@ use util;
 /**/
 fn match_input(in1: &TxIn, in2: &TxIn) -> bool
 {
-  /* We don't check scriptSig since that will be different
-   * for different transactions. */
+  /* scriptSig는 트랜잭션마다 달라질 수 있으므로 검사하지 않는다. */
   in1.prev_hash == in2.prev_hash &&
   in1.prev_index == in2.prev_index &&
   in1.nSequence == in2.nSequence
 }
 
 /**
- * Merge unsigned transactions
- * This function takes a bunch of transactions and creates a new, big
- * transaction with all the inputs and outputs from the originals, but
- * no signatures. It also randomizes the ordering.
+ * 미서명 트랜잭션 병합
+ * 이 함수는 여러 트랜잭션을 받아 새로운 큰 트랜잭션을 만들며,
+ * 원본들의 모든 입력/출력을 포함하되
+ * 서명은 제외한다. 또한 순서를 무작위화한다.
  */
 pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transaction>
 {
   if txlist.len() == 0 { return None; }
 
-  /* The first transaction will be our ``master'' list of inputs and outputs.
-   * Every other transaction needs to match this or else that's a failure.
+  /* 첫 번째 트랜잭션을 입력/출력의 ``마스터'' 목록으로 사용한다.
+   * 나머지 트랜잭션은 이것과 일치해야 하며, 아니면 실패다.
    */
   let mut master = Transaction {
     nVersion: txlist[0].nVersion,
@@ -35,11 +34,10 @@ pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transactio
     input: ~[], output: ~[]
   };
 
-  /* Loop through all transactions, merging onto master */
+  /* 모든 트랜잭션을 순회하며 마스터에 병합 */
   for tx in txlist.iter() {
-    /* Check that version and locktime match, because otherwise it's unclear
-     * what to do. (I guess it doesn't matter, in principle some humans will
-     * verify this before it gets signed..) */
+    /* version과 locktime이 일치하는지 확인한다. 그렇지 않으면
+     * 어떻게 처리할지 불명확하다 (서명 전 검증에 의존한다고 가정). */
     if tx.nVersion != master.nVersion {
       println (format! ("err: Tx {:s} did not match {:s} (version {:u} vs {:u})!",
         util::u8_to_hex_string (master.to_hash()),
@@ -55,7 +53,7 @@ pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transactio
       return None;
     }
 
-    /* Pile all the outputs on -- check for duplicate outputs and sum them */
+    /* 모든 출력을 누적하고 중복 출력을 확인해 합산 */
     for tx in tx.output.iter() {
       let mut already_present = false;
       for tx_dup in master.output.mut_iter() {
@@ -69,10 +67,8 @@ pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transactio
       }
     }
 
-    /* Check for duplicate inputs and bail otherwise. This is pretty-much
-     * guaranteed to be a mistake. (Probably there are also duplicate outputs,
-     * but those are legal, so I don't want to delete them.) POLS says we
-     * crash. */
+    /* 중복 입력이 있으면 중단한다. 거의 확실히 실수이기 때문이다.
+     * (중복 출력도 있을 수 있지만 합법이므로 제거하지 않는다.) */
     for tx in tx.input.iter() {
       for tx_dup in master.input.iter() {
         if match_input (tx, tx_dup) {
@@ -82,11 +78,10 @@ pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transactio
         }
       }
       let mut new_tx = tx.clone();
-      /* Remove any existing signature, except in the case that the sighash type
-       * is NONE|ANYONECANPAY, since this is the only signature type that will
-       * remain valid after a merger. (Actually, this is not true -- CodeShark
-       * has a multisigner which stores some sort of information in here, which
-       * is destroyed when I clear it. So TODO support this somehow.) */
+      /* 기존 서명은 제거하되 sighash 타입이 NONE|ANYONECANPAY인 경우는 예외다.
+       * 병합 후에도 유효한 서명 타입이 사실상 이것뿐이기 때문이다.
+       * (다만 CodeShark의 multisigner처럼 정보를 담는 경우는 지워질 수 있어
+       * TODO: 향후 지원이 필요하다.) */
       if new_tx.nHashType != 0x82 {
         new_tx.scriptSig = ~[];
       }
@@ -94,13 +89,12 @@ pub fn merge_unsigned_transactions (txlist: &[Transaction]) -> Option<Transactio
     }
   }
 
-  /* Randomize the inputs and outputs */
+  /* 입력과 출력을 무작위화 */
   let mut rng = rand::task_rng();
   rng.shuffle_mut (master.input);
   rng.shuffle_mut (master.output);
 
   Some(master)
 }
-
 
 

@@ -10,9 +10,9 @@ process_output()
   local input="$2"
   local ln
 
-  # Run the program output through an awk script which
-  # simply filters for the actual data output and echos
-  # it in a well-defined order.
+  # 프로그램 출력을 awk 스크립트로 전달하여
+  # 실제 데이터 출력만 필터링한 뒤
+  # 정해진 순서로 출력한다.
   "$prog" < "$input" | awk '
   function despace(s) {
     gsub(/[[:space:]]*/, "", s);
@@ -46,7 +46,7 @@ process_output()
 
 
 
-# Run unsigned tests
+# unsigned 테스트 실행
 for suite in $TESTDIR/unsigned/*
 do
   for run in $suite/*.input

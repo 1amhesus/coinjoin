@@ -1,5 +1,5 @@
 
-# Note - to use this script you need Jeff Garzik's python-bitcoinrpc
+# 참고 - 이 스크립트를 사용하려면 Jeff Garzik의 python-bitcoinrpc가 필요하다
 # https://github.com/jgarzik/python-bitcoinrpc
 
 import os
@@ -7,7 +7,7 @@ import sys;
 import json;
 from bitcoinrpc.authproxy import AuthServiceProxy;
 
-# SET THESE VALUES
+# 이 값들을 설정하라
 rpc_user = "bitcoinrpc";
 rpc_pass = "A7Xr149i7F6GxkhDbxWDTbmXooz1UZGhhyUYvaajA13Z";
 rpc_host = "localhost";
@@ -18,14 +18,14 @@ donation_per_input = 3000;
 donation_address = "1ForFeesAndDonationsSpendHerdtWbWy";
 
 
-# http://stackoverflow.com/questions/626796/how-do-i-find-the-windows-common-application-data-folder-using-python
+# 윈도우 공용 애플리케이션 데이터 폴더를 찾는 참고 링크
 try:
     from win32com.shell import shellcon, shell            
     config_file = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0) + "/Bitcoin/bitcoin.conf"
-except ImportError: # quick semi-nasty fallback for non-windows/win32com case
+except ImportError: # non-windows/win32com 환경을 위한 간단한 대체 처리
     config_file = os.path.expanduser("~") + "/.bitcoin/bitcoin.conf"
 
-# thanks ryan-c for this function
+# 이 함수는 ryan-c의 도움을 받았다
 def asp_from_config(filename):
     rpcport = '8332'
     rpcconn = '127.0.0.1'
@@ -79,9 +79,9 @@ if target_out > target_in:
   exit (0);
 
 
-# FIND INPUTS
-# TODO: have a smarter coin selection algo
-# For now we just sort the coins by increasing abs(value - target output), then select in order
+# 입력 찾기
+# TODO: 더 똑똑한 코인 선택 알고리즘 적용
+# 현재는 abs(value - target output) 증가 순으로 코인을 정렬한 뒤 순서대로 선택한다
 inputs = [];
 donation = 0;
 total_in = 0;
@@ -98,7 +98,7 @@ for coin in unspent:
 if donation < donation_minimum:
   donation = donation_minimum;
 
-# FIND OUTPUTS
+# 출력 찾기
 outputs = dict ();
 outputs[donation_address] = from_satoshi (donation);
 total_in -= donation;
@@ -107,7 +107,7 @@ while total_in > target_out:
   total_in -= target_out;
 outputs[service.getnewaddress()] = from_satoshi (total_in);
 
-# Make the transaction
+# 트랜잭션 생성
 print service.createrawtransaction (inputs, outputs);
 
 

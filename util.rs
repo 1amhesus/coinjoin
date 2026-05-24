@@ -4,7 +4,7 @@ use std::io::stdio::{stdin};
 use std::io::io_error;
 
 /**
- * Reads two characters from stdin, which we interpret as an 8-bit hex number
+ * stdin에서 두 문자를 읽어 8비트 16진수로 해석한다
  */
 pub fn read_hex_char() -> Option<u8>
 {
@@ -30,7 +30,7 @@ pub fn read_hex_char() -> Option<u8>
 }
 
 /**
- * Reads an entire array of hex values from stdin
+ * stdin에서 16진수 값 배열 전체를 읽는다
  */
 pub fn read_hex() -> ~[u8]
 {
@@ -49,7 +49,7 @@ pub fn read_hex() -> ~[u8]
 }
 
 /**
- * Converts a bitstring to a hexadecimal string for user output
+ * 사용자 출력용으로 비트열을 16진수 문자열로 변환한다
  */
 pub fn u8_to_hex_string(data: &[u8]) -> ~str {
   let hex_chars = "0123456789abcdef";

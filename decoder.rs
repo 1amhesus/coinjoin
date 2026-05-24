@@ -31,10 +31,10 @@ fn decode_integer (iter: &mut VecIterator<u8>, width: int) -> Token {
 
 pub fn decode_token (iter: &mut VecIterator<u8>, expected_token: TokenType) -> Token {
   match expected_token {
-    /* Fixed-width integers */
+    /* 고정 길이 정수 */
     Unsigned32 => { decode_integer (iter, 4) }
     Unsigned64 => { decode_integer (iter, 8) }
-    /* Variable-width integers */
+    /* 가변 길이 정수 */
     VarInt => {
       match iter.next() {
         Some(&ch) => {
@@ -48,7 +48,7 @@ pub fn decode_token (iter: &mut VecIterator<u8>, expected_token: TokenType) -> T
         None => Invalid
       }
     }
-    /* Strings */
+    /* 문자열 */
     Bytestring(len) => {
       let mut success = true;
       let mut rv: ~[u8] = ~[];
