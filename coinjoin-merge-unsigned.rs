@@ -1,7 +1,7 @@
 
 use hash::Hashable;
 
-/* Modules */
+/* 모듈 */
 mod decoder;
 mod hash;
 mod merge_unsigned;
@@ -9,7 +9,7 @@ mod transaction;
 mod util;
 
 /**
- * Entry point
+ * 진입점
  */
 fn main()
 {

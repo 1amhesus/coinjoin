@@ -10,10 +10,10 @@ extern {
   fn csha256_destroy (input: *u8);
 }
 
-/* HASH FUNCTIONS */
+/* 해시 함수 */
 
 /**
- * Compute a SHA256 sum of a raw bitstring
+ * 원시 비트열의 SHA256 합을 계산한다
  */
 pub fn sha256_sum (input: &[u8]) -> ~[u8]
 {
@@ -26,7 +26,7 @@ pub fn sha256_sum (input: &[u8]) -> ~[u8]
 }
 
 
-/* BYTESTRING HELPER FUNCTIONS */
+/* 바이트열 보조 함수 */
 
 pub fn push_u32_le (mut buf: ~[u8], val: u32) -> ~[u8]
 {
@@ -75,7 +75,7 @@ pub fn push_vi_le (mut buf: ~[u8], val: u64) -> ~[u8]
 
 
 /**
- * Trait for hashable things (analogous to Serialize* in bitcoind)
+ * 해시 가능한 대상용 트레이트 (bitcoind의 Serialize*와 유사)
  */
 pub trait Hashable {
   fn to_hash(&self) -> ~[u8];
